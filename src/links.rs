@@ -6,6 +6,7 @@ use url::Url;
 
 use crate::{state::ServerState, util::id::EntityId};
 
+#[non_exhaustive]
 pub struct ServerLinks {
     pub issuer: Url,
     pub oauth_authorize: Url,
@@ -17,8 +18,6 @@ pub struct ServerLinks {
     pub register: Url,
     pub logout: Url,
     pub user: Url,
-
-    _private: (),
 }
 
 impl ServerLinks {
@@ -34,7 +33,6 @@ impl ServerLinks {
             logout: issuer.join("/logout")?,
             user: issuer.join("/user")?,
             issuer,
-            _private: (),
         })
     }
 

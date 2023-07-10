@@ -43,7 +43,7 @@ impl TryFrom<&str> for EntityId {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         if value.len() == 8 {
             Ok(EntityId(
-                base62::decode(&value).map_err(GenericIdError::Decode)? as u64,
+                base62::decode(value).map_err(GenericIdError::Decode)? as u64,
             ))
         } else {
             Err(GenericIdError::WrongLength(value.len()))

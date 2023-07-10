@@ -59,7 +59,7 @@ where
         Ok(CsrfNonce(
             jar.get("csrf")
                 .map(|x| x.value().to_string())
-                .unwrap_or_else(|| crate::util::gen_secret()),
+                .unwrap_or_else(crate::util::gen_secret),
         ))
     }
 }

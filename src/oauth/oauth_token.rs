@@ -12,7 +12,6 @@ use openidconnect::{
     StandardErrorResponse, SubjectIdentifier,
 };
 use serde::Deserialize;
-use time::OffsetDateTime;
 
 use crate::error::ApiError;
 use crate::model::auth_codes::AuthorizationCode;
@@ -75,10 +74,7 @@ pub async fn oauth_token(
         vec![Audience::new(client_id.to_string())],
         Utc::now() + Duration::minutes(30),
         Utc::now(),
-        {
-            let claims = StandardClaims::new(SubjectIdentifier::new(flow.user_id.to_string()));
-            claims
-        },
+        StandardClaims::new(SubjectIdentifier::new(flow.user_id.to_string())),
         EmptyAdditionalClaims {},
     );
 

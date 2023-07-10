@@ -185,7 +185,7 @@ impl FromRequestParts<ServerState> for AuthSession {
             let orig_uri = OriginalUri::from_request_parts(parts, state).await.unwrap();
 
             return Err(
-                Redirect::to(state.links.login_from(&orig_uri.to_string()).as_str())
+                Redirect::to(state.links.login_from(orig_uri.to_string()).as_str())
                     .into_response(),
             );
         };

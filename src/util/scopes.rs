@@ -32,7 +32,7 @@ impl Display for Scopes {
 
 impl From<&str> for Scopes {
     fn from(value: &str) -> Self {
-        Self(value.split(" ").map(|x| x.to_string()).collect::<Vec<_>>())
+        Self(value.split(' ').map(|x| x.to_string()).collect::<Vec<_>>())
     }
 }
 
