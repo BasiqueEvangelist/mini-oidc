@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT EXISTS(SELECT id from jwt_keys WHERE id=id) AS has_keys",
+  "describe": {
+    "columns": [
+      {
+        "name": "has_keys",
+        "ordinal": 0,
+        "type_info": "Int"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "eeed5bd7b32dcbae3656160a450eada62d21e0838c7114858a1c65bec1915cb5"
+}

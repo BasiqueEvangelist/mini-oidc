@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1 FROM client_redirect_uris\n            WHERE client_id=$1 AND redirect_uri=$2\n        ) AS `valid:bool`\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "valid:bool",
+        "ordinal": 0,
+        "type_info": "Int"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "3615e47745743ce2283575afc4f2f3c51869a5f8f86c0b1572146ee5620402e6"
+}

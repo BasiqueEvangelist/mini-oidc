@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                SELECT id as `id:EntityId`, pem_body\n                FROM jwt_keys\n                ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id:EntityId",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "pem_body",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "ba20e74117c06efacf85be784fc2b8dafa883958217a8607a0575bbebdc49337"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO authorization_codes\n            (uid, user_id, client_id, body, expires)\n            VALUES\n            ($1, $2, $3, $4, $5)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "5e2fbc7cbdf1cfd1bbd471b528b43e33f808a523682a01aef8b7ec005e68bdd2"
+}

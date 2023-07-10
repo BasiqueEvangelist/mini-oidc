@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+<form method="POST" type="application/x-www-form-urlencoded" style="text-align: center">
+    <input class="input_underline h2" type="text" name="username" placeholder="Username">
+    <br><br>
+    <input class="input_underline h2" type="email" name="email" placeholder="Email">
+    <br><br>
+    <input class="input_underline h2" type="password" name="password" placeholder="Password">
+    <br>
+    {% match error %}
+    {% when Some with (err) %}
+    <div class="alert-danger">{{ err }}</div>
+    {% when None %}
+    {% endmatch %}
+    <br>
+    <input type="hidden" name="csrf" value="{{ base.csrf }}">
+    <input class="submit h2" type="submit" name="" value="Register">
+</form>
+{% endblock %}

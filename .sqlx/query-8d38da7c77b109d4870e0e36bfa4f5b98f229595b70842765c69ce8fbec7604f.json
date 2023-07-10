@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT u.id as `id:EntityId`, u.password_hash as `password_hash:String`\n        FROM users u\n        WHERE u.username = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id:EntityId",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "password_hash:String",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "8d38da7c77b109d4870e0e36bfa4f5b98f229595b70842765c69ce8fbec7604f"
+}

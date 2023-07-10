@@ -1,0 +1,125 @@
+<html>
+
+<head>
+    <title>{% block title %}mini-oidc{% endblock %}</title>
+
+    <style>
+        body {
+            line-height: 1.6;
+            font-size: 18px;
+            margin: 0px;
+            font-family: sans-serif;
+        }
+
+        header {
+            width: 100%;
+            background-color: orange;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav,
+        main {
+            margin: auto;
+            max-width: 850px;
+        }
+
+        main {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        h1,
+        h2,
+        h3 {
+            line-height: 1.2
+        }
+
+        .input_underline {
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            border-bottom-width: 2px;
+            border-color: orange;
+            background-color: #fafaff;
+        }
+
+        .h2 {
+            font-size: 1.2em;
+        }
+
+        .submit {
+            background-color: orange;
+            color: white;
+            border: none;
+            width: 6em;
+            height: 1.5em;
+        }
+
+        .alert-danger {
+            padding: 5px;
+            border: 5px #ffbfbd;
+        }
+
+        .grow {
+            flex-grow: 1;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        nav a {
+            color: black;
+        }
+
+        .link-button {
+            border: none;
+            background: none;
+            padding: 0;
+            font-family: sans-serif;
+            cursor: pointer;
+            display: inline;
+            font-size: inherit;
+            font-weight: inherit;
+        }
+    </style>
+
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">mini-oidc</div>
+            <div class="grow"></div>
+            <div class="login-controls">
+                {% match base.auth %}
+                {% when Some with (session) %}
+                <a href="{{base.links.user_page(session.username)}}">{{session.username}}</a>
+                |
+                <form action="{{base.links.logout}}" method="POST" type="application/x-www-form-urlencoded"
+                    style="display: inline">
+                    <input type="hidden" name="csrf" value="{{ base.csrf }}">
+
+                    <button type="submit" class="link-button">Log out</button>
+                </form>
+                {% when None %}
+                <a href="{{base.links.login_from(base.path)}}">Login</a>
+                {% endmatch %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+
+</html>

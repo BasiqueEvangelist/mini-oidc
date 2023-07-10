@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT 1 as `ae`\n        FROM clients\n        WHERE id = $1 AND client_secret = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "ae",
+        "ordinal": 0,
+        "type_info": "Int"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "1571da3cdbf69315d86cddbd9bcd178147888aa321b311999f0a9a14e5bb46d9"
+}

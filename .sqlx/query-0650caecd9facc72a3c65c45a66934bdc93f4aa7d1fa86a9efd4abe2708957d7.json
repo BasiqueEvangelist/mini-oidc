@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                DELETE FROM authorization_codes\n                WHERE expires < $1\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "0650caecd9facc72a3c65c45a66934bdc93f4aa7d1fa86a9efd4abe2708957d7"
+}

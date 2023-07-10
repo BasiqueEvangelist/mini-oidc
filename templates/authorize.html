@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Authorize {{client_name}} to access your profile
+{% endblock %}
+
+{% block content %}
+<p>
+    Authorize
+    <i>{{ client_name }}</i>
+    <img src="{{ logo_uri }}" width="16" height="16">
+    to access your profile?
+</p>
+
+<p>Requested scopes:</p>
+<ul>
+    {% for scope in scopes.iter() %}
+    <li>
+        {{scope.as_str()}}
+    </li>
+    {% endfor %}
+</ul>
+
+<form method="POST" type="application/x-www-form-urlencoded">
+    <input type="hidden" name="csrf" value="{{ base.csrf }}">
+    <button class="submit h2" type="submit" name="action" value="allow">Allow</button>
+    <button class="submit h2" type="submit" name="action" value="deny">Deny</button>
+</form>
+
+{% endblock %}

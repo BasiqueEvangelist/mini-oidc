@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO jwt_keys\n            (id, pem_body)\n            VALUES\n            ($1, $2)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "e24061bfa1e6bdd4fc5d280d558522bf2c6f22e4612ff1880dd76ee4ab20215e"
+}

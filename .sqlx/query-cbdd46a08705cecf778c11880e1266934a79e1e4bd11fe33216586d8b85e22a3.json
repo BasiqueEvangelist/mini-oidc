@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT client_name, logo_uri as `logo_uri:String`\n        FROM clients\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "client_name",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "logo_uri:String",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "cbdd46a08705cecf778c11880e1266934a79e1e4bd11fe33216586d8b85e22a3"
+}

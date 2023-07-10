@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    INSERT INTO client_redirect_uris\n                    (client_id, redirect_uri)\n                    VALUES\n                    ($1, $2)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "08e29851da4be4ddd46667dffc914dd1260048a55f365f7d4db134d5cb845b50"
+}

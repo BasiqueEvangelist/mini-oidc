@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT uid as `uid:String`, user_id as `user_id:EntityId`, client_id as `client_id:EntityId`, body as `body:Json<AuthorizationCodeBody>`, expires as `expires:OffsetDateTime`\n            FROM authorization_codes\n            WHERE uid = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "uid:String",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id:EntityId",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "client_id:EntityId",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "body:Json<AuthorizationCodeBody>",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "expires:OffsetDateTime",
+        "ordinal": 4,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "416606af1013012e1e8104a18523ae54363e64be1e14557960b908463ca64817"
+}

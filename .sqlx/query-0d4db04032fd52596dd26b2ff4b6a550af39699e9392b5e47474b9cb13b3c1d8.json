@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE sessions\n                SET last_ip = $1, expires = $2\n                WHERE uid = $3\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "0d4db04032fd52596dd26b2ff4b6a550af39699e9392b5e47474b9cb13b3c1d8"
+}
