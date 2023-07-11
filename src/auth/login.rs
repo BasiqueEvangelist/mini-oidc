@@ -31,14 +31,11 @@ struct LoginTemplate {
 }
 
 pub async fn login_view(redir: RedirectQuery, base: TemplateBase) -> impl IntoResponse {
-    (
-        base.csrf.clone(),
-        LoginTemplate {
-            base: base.clone(),
-            register_url: base.links.register_from(redir.redirect_uri),
-            error: None,
-        },
-    )
+    LoginTemplate {
+        base: base.clone(),
+        register_url: base.links.register_from(redir.redirect_uri),
+        error: None,
+    }
 }
 
 #[derive(Deserialize)]

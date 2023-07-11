@@ -5,8 +5,10 @@ use axum::{
 
 use crate::state::ServerState;
 
+pub mod claim_gatherer;
 mod oidc_config;
 mod oidc_register;
+mod oidc_userinfo;
 
 pub fn router() -> Router<ServerState> {
     Router::new()
@@ -16,4 +18,5 @@ pub fn router() -> Router<ServerState> {
         )
         .route("/api/oidc/jwks", get(oidc_config::keyset))
         .route("/api/oidc/register", post(oidc_register::register_client))
+        .route("/api/oidc/userinfo", get(oidc_userinfo::userinfo))
 }

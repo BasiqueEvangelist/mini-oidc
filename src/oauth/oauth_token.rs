@@ -8,14 +8,16 @@ use openidconnect::core::{
     CoreJwsSigningAlgorithm, CoreTokenResponse,
 };
 use openidconnect::{
-    AccessToken, Audience, EmptyAdditionalClaims, EmptyExtraTokenFields, IssuerUrl, StandardClaims,
-    StandardErrorResponse, SubjectIdentifier,
+    Audience, EmptyAdditionalClaims, EmptyExtraTokenFields, IssuerUrl,
+    StandardErrorResponse,
 };
 use serde::Deserialize;
 
 use crate::error::ApiError;
+use crate::model::access_tokens::{AccessToken, AccessTokenBody};
 use crate::model::auth_codes::AuthorizationCode;
 use crate::model::signing_keys::SigningKey;
+use crate::oidc::claim_gatherer;
 use crate::state::ServerState;
 use crate::util::id::EntityId;
 
@@ -74,14 +76,14 @@ pub async fn oauth_token(
         vec![Audience::new(client_id.to_string())],
         Utc::now() + Duration::minutes(30),
         Utc::now(),
-        StandardClaims::new(SubjectIdentifier::new(flow.user_id.to_string())),
+        claim_gatherer::gather(flow.user_id, &flow.body.scope, &state.pool).await?,
         EmptyAdditionalClaims {},
     );
 
     let keys = SigningKey::get_all(&state.pool).await?;
     let key = keys.values().next().unwrap();
 
-    let token = CoreIdToken::new(
+    let id_token = CoreIdToken::new(
         claims,
         &key.key,
         CoreJwsSigningAlgorithm::RsaSsaPkcs1V15Sha256,
@@ -90,10 +92,20 @@ pub async fn oauth_token(
     )
     .unwrap();
 
+    let access_token = AccessToken::insert(
+        flow.user_id,
+        flow.client_id,
+        AccessTokenBody {
+            scope: flow.body.scope,
+        },
+        &state.pool,
+    )
+    .await?;
+
     let res = CoreTokenResponse::new(
-        AccessToken::new("nope".to_string()),
+        openidconnect::AccessToken::new(access_token),
         openidconnect::core::CoreTokenType::Bearer,
-        CoreIdTokenFields::new(Some(token), EmptyExtraTokenFields {}),
+        CoreIdTokenFields::new(Some(id_token), EmptyExtraTokenFields {}),
     );
 
     Ok(Json(res))

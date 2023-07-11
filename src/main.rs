@@ -1,6 +1,13 @@
 use std::net::SocketAddr;
 
-use axum::{middleware, routing::get, Router};
+use axum::{
+    body::Body,
+    http::Request,
+    middleware::{self, Next},
+    response::Response,
+    routing::get,
+    Router,
+};
 
 use crate::{auth::session::AuthSession, model::auth_codes::AuthorizationCode};
 
@@ -25,6 +32,11 @@ pub async fn main() -> anyhow::Result<()> {
     tokio::spawn(AuthorizationCode::cleanup_job(state.pool.clone()));
     tokio::spawn(AuthSession::cleanup_job(state.pool.clone()));
 
+    async fn log_req(req: Request<Body>, next: Next<Body>) -> Response {
+        dbg!(&req);
+        next.run(req).await
+    }
+
     let app = Router::new()
         .route("/", get(server_info::index))
         .route("/api/", get(server_info::server_info))
@@ -39,6 +51,7 @@ pub async fn main() -> anyhow::Result<()> {
             state.clone(),
             util::csrf::layer,
         ))
+        .layer(middleware::from_fn(log_req))
         .with_state(state.clone());
 
     let server = axum::Server::try_bind(&state.bind_addr)?

@@ -4,10 +4,11 @@ use axum::{extract::State, response::IntoResponse, Json};
 
 use openidconnect::{
     core::{
-        CoreJwsSigningAlgorithm, CoreProviderMetadata, CoreResponseType, CoreSubjectIdentifierType,
+        CoreClaimName, CoreJwsSigningAlgorithm, CoreProviderMetadata, CoreResponseType,
+        CoreSubjectIdentifierType,
     },
     AuthUrl, EmptyAdditionalProviderMetadata, IssuerUrl, JsonWebKeySet, JsonWebKeySetUrl,
-    RegistrationUrl, ResponseTypes, TokenUrl, UserInfoUrl,
+    RegistrationUrl, ResponseTypes, Scope, TokenUrl, UserInfoUrl,
 };
 
 use crate::{
@@ -26,7 +27,22 @@ pub async fn configuration(links: State<Arc<ServerLinks>>) -> impl IntoResponse 
     )
     .set_token_endpoint(Some(TokenUrl::from_url(links.oauth_token.clone())))
     .set_userinfo_endpoint(Some(UserInfoUrl::from_url(links.oidc_userinfo.clone())))
-    .set_registration_endpoint(Some(RegistrationUrl::from_url(links.oidc_register.clone())));
+    .set_registration_endpoint(Some(RegistrationUrl::from_url(links.oidc_register.clone())))
+    .set_scopes_supported(Some(vec![
+        Scope::new("openid".to_string()),
+        Scope::new("profile".to_string()),
+        Scope::new("email".to_string()),
+    ]))
+    .set_claims_supported(Some(vec![
+        CoreClaimName::new("sub".to_string()),
+        CoreClaimName::new("iss".to_string()),
+        CoreClaimName::new("aud".to_string()),
+        CoreClaimName::new("exp".to_string()),
+        CoreClaimName::new("iat".to_string()),
+        CoreClaimName::new("preferred_username".to_string()),
+        CoreClaimName::new("email".to_string()),
+        CoreClaimName::new("email_verified".to_string()),
+    ]));
 
     Json(metadata)
 }
