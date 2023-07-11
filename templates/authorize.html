@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Authorize {{client_name}} to access your profile
+Authorize {{client_name|e}} to access your profile
 {% endblock %}
 
 {% block content %}
 <p>
     Authorize
     <i>{{ client_name }}</i>
-    <img src="{{ logo_uri }}" width="16" height="16">
+    <img src="{{ logo_uri|e }}" width="16" height="16">
     to access your profile?
 </p>
 
@@ -16,7 +16,7 @@ Authorize {{client_name}} to access your profile
 <ul>
     {% for scope in scopes.iter() %}
     <li>
-        {{scope.as_str()}}
+        {{scope.as_str()|e}}
     </li>
     {% endfor %}
 </ul>
