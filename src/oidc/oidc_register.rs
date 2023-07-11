@@ -22,12 +22,6 @@ pub async fn register_client(
 
     conn.transaction::<_, _, ApiError>(|tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>| {
         Box::pin(async move {
-            let redirect_uris: Vec<String> = req
-                .redirect_uris()
-                .iter()
-                .map(|x| x.url().to_string())
-                .collect();
-
             let Some(client_name) = req
                 .client_name()
                 .and_then(|x| x.get(None))
@@ -83,7 +77,9 @@ pub async fn register_client(
             .execute(&mut **tx)
             .await?;
 
-            for redirect_uri in redirect_uris {
+            for redirect_uri in req.redirect_uris() {
+                let uri_q = redirect_uri.as_str();
+
                 sqlx::query!(
                     "
                     INSERT INTO client_redirect_uris
@@ -92,7 +88,24 @@ pub async fn register_client(
                     ($1, $2)
                     ",
                     client_id,
-                    redirect_uri
+                    uri_q
+                )
+                .execute(&mut **tx)
+                .await?;
+            }
+
+            for contact in req.contacts().iter().flat_map(|x| x.iter()) {
+                let email_q = contact.as_str();
+
+                sqlx::query!(
+                    "
+                    INSERT INTO client_contacts
+                    (client_id, email)
+                    VALUES
+                    ($1, $2)
+                    ",
+                    client_id,
+                    email_q
                 )
                 .execute(&mut **tx)
                 .await?;
@@ -113,7 +126,9 @@ pub async fn register_client(
                         registration_token.clone(),
                     )))
                     .set_registration_client_uri(Some(state.links.oidc_config_client(client_id)))
-                    .set_application_type(Some(app_type)),
+                    .set_application_type(Some(app_type))
+                    .set_redirect_uris(req.redirect_uris().clone())
+                    .set_contacts(req.contacts().cloned()),
                 ),
             ))
         })
