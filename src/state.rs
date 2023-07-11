@@ -71,6 +71,7 @@ pub async fn init() -> anyhow::Result<ServerState> {
     })
 }
 
+#[tracing::instrument]
 async fn generate_and_add_key(pool: &sqlx::Pool<Sqlite>) -> anyhow::Result<()> {
     let key = tokio::task::spawn_blocking(|| {
         let _enter = tracing::info_span!("generating RSA key").entered();
