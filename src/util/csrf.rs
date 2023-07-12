@@ -2,12 +2,8 @@ use std::{convert::Infallible, fmt::Display};
 
 use askama_axum::IntoResponse;
 use axum::{
-    async_trait,
-    body::Body,
-    extract::FromRequestParts,
-    http::request::Parts,
-    middleware::Next,
-    response::{IntoResponseParts, Response, ResponseParts},
+    async_trait, body::Body, extract::FromRequestParts, http::request::Parts, middleware::Next,
+    response::Response,
 };
 use axum_extra::extract::{
     cookie::{Cookie, Expiration},
@@ -22,7 +18,18 @@ pub async fn layer(
     request: axum::http::Request<Body>,
     next: Next<Body>,
 ) -> Response {
-    (csrf, next.run(request).await).into_response()
+    (
+        CookieJar::new().add(
+            Cookie::build("csrf", csrf.0)
+                .expires(Expiration::Session)
+                .path("/")
+                // .secure(true)
+                .http_only(true)
+                .finish(),
+        ),
+        next.run(request).await,
+    )
+        .into_response()
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
@@ -31,6 +38,7 @@ pub struct CsrfNonce(pub String);
 impl CsrfNonce {
     pub fn verify(&self, other: &CsrfNonce) -> Result<(), ApiError> {
         if self != other {
+            tracing::debug!("CSRF check failed! {self} != {other}");
             Err(ApiError::CsrfFailure)
         } else {
             Ok(())
@@ -61,24 +69,5 @@ where
                 .map(|x| x.value().to_string())
                 .unwrap_or_else(crate::util::gen_secret),
         ))
-    }
-}
-
-impl IntoResponseParts for CsrfNonce {
-    type Error = Infallible;
-
-    fn into_response_parts(
-        self,
-        res: ResponseParts,
-    ) -> Result<axum::response::ResponseParts, Self::Error> {
-        CookieJar::new()
-            .add(
-                Cookie::build("csrf", self.0)
-                    .expires(Expiration::Session)
-                    .secure(true)
-                    .http_only(true)
-                    .finish(),
-            )
-            .into_response_parts(res)
     }
 }

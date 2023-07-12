@@ -117,7 +117,7 @@ impl AuthSession {
 
         Ok(Cookie::build(AuthSession::COOKIE_NAME, Cow::Owned(uid))
             .expires(Expiration::DateTime(expires))
-            .secure(true)
+            // .secure(true)
             .http_only(true)
             .finish())
     }

@@ -29,7 +29,7 @@ struct RegisterTemplate {
 }
 
 pub async fn register_view(base: TemplateBase) -> impl IntoResponse {
-    (base.csrf.clone(), RegisterTemplate { base, error: None })
+    RegisterTemplate { base, error: None }
 }
 
 #[derive(Deserialize)]

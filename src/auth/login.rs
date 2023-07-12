@@ -65,14 +65,13 @@ pub async fn login(
     .fetch_optional(&state.pool)
     .await?
     else {
-        return Ok((
-            base.csrf.clone(),
+        return Ok(
             LoginTemplate {
                 base: base.clone(),
                 error: Some("No such user".to_string()),
                 register_url: state.links.register_from(redir.redirect_uri),
-            },
-        )
+            }
+        
             .into_response());
     };
 
@@ -81,14 +80,13 @@ pub async fn login(
     let res = Argon2::default().verify_password(req.password.as_bytes(), &hash);
 
     if let Err(password_hash::Error::Password) = res {
-        return Ok((
-            base.csrf.clone(),
+        return Ok(
             LoginTemplate {
                 base: base.clone(),
                 error: Some("Wrong password".to_string()),
                 register_url: state.links.register_from(redir.redirect_uri),
-            },
-        )
+            }
+        
             .into_response());
     } else {
         res?;
