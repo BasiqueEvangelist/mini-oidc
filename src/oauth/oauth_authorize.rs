@@ -1,29 +1,19 @@
 use askama::Template;
-use axum::{
-    extract::Query,
-    response::{IntoResponse, Redirect},
-    Form,
-};
+use axum::{response::IntoResponse, Form};
 
+use openidconnect::core::CoreAuthErrorResponseType;
 use serde::Deserialize;
-use url::Url;
 
 use crate::{
     auth::session::AuthSession,
     error::ApiError,
     model::auth_codes::{AuthorizationCode, AuthorizationCodeBody},
     state::ServerState,
-    util::{csrf::CsrfNonce, id::EntityId, scopes::Scopes, template::TemplateBase},
+    util::{
+        csrf::CsrfNonce, extract::OidcAuthRequestHead, id::EntityId, scopes::Scopes,
+        template::TemplateBase,
+    },
 };
-
-#[derive(Deserialize)]
-pub struct AuthorizationCodeRequest {
-    pub client_id: EntityId,
-    pub redirect_uri: Url,
-    pub scope: Scopes,
-    pub state: String,
-    pub nonce: Option<String>,
-}
 
 #[derive(Template)]
 #[template(path = "authorize.html")]
@@ -35,18 +25,21 @@ struct AuthorizeTemplate {
 }
 
 pub async fn authorization_code(
-    Query(req): Query<AuthorizationCodeRequest>,
+    req: OidcAuthRequestHead,
     base: TemplateBase,
     _auth: AuthSession,
     state: ServerState,
 ) -> Result<impl IntoResponse, ApiError> {
+    let redirect_uri_q = req.redirect_uri.as_str();
     let Some(record) = sqlx::query!(
         "
-        SELECT client_name, logo_uri as `logo_uri:String`
-        FROM clients
-        WHERE id = $1
+        SELECT c.client_name, c.logo_uri as `logo_uri:String`
+        FROM clients c
+        INNER JOIN client_redirect_uris cru ON cru.client_id = c.id
+        WHERE c.id = $1 AND cru.redirect_uri = $2
         ",
-        req.client_id
+        req.client_id,
+        redirect_uri_q
     )
     .fetch_optional(&state.pool)
     .await?
@@ -57,32 +50,7 @@ pub async fn authorization_code(
             .into());
     };
 
-    let redirect_uri_q = req.redirect_uri.as_str();
-
-    let redirect_uri_valid = sqlx::query!(
-        "
-        SELECT EXISTS(
-            SELECT 1 FROM client_redirect_uris
-            WHERE client_id=$1 AND redirect_uri=$2
-        ) AS `valid:bool`
-        ",
-        req.client_id,
-        redirect_uri_q,
-    )
-    .fetch_one(&state.pool)
-    .await?
-    .valid
-    .unwrap_or(false);
-
-    if !redirect_uri_valid {
-        // TODO: display this to user properly.
-        return Err(crate::error::not_found()
-            .with_detail(format!(
-                "'{}' is not a valid redirect URI.",
-                req.redirect_uri
-            ))
-            .into());
-    }
+    let req = req.next()?;
 
     Ok(AuthorizeTemplate {
         client_name: record.client_name,
@@ -106,7 +74,7 @@ pub struct AuthorizeRequest {
 }
 
 pub async fn authorization_code_post(
-    Query(req): Query<AuthorizationCodeRequest>,
+    req: OidcAuthRequestHead,
     base: TemplateBase,
     auth: AuthSession,
     state: ServerState,
@@ -140,43 +108,26 @@ pub async fn authorization_code_post(
             .into());
     }
 
+    let req = req.next()?;
+
     if let AuthorizeAction::Deny = req_f.action {
-        let redirect_to = {
-            let mut redirect_to = req.redirect_uri.clone();
-
-            redirect_to
-                .query_pairs_mut()
-                .append_pair("state", &req.state)
-                .append_pair("error", "access_denied");
-
-            redirect_to
-        };
-
-        return Ok(Redirect::to(redirect_to.as_str()));
+        return Err(req.error(
+            CoreAuthErrorResponseType::AccessDenied,
+            "User denied access.",
+        ));
     }
 
     let code = AuthorizationCode::insert(
         auth.user_id,
         req.client_id,
         AuthorizationCodeBody {
-            scope: req.scope,
+            scope: req.scope.clone(),
             state: req.state.clone(),
-            nonce: req.nonce,
+            nonce: req.nonce.clone(),
         },
         &state.pool,
     )
     .await?;
 
-    let redirect_to = {
-        let mut redirect_to = req.redirect_uri.clone();
-
-        redirect_to
-            .query_pairs_mut()
-            .append_pair("code", &code)
-            .append_pair("state", &req.state);
-
-        redirect_to
-    };
-
-    Ok(Redirect::to(redirect_to.as_str()))
+    Ok(req.proceed(&code))
 }

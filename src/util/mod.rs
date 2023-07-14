@@ -4,6 +4,7 @@ pub mod csrf;
 pub mod id;
 pub mod scopes;
 pub mod template;
+pub mod extract;
 
 pub fn gen_secret() -> String {
     rand::thread_rng()
